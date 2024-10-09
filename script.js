@@ -1,25 +1,72 @@
+const BASE_URL = 'http://127.0.0.1:5500'
+
 const inputEl = (document.getElementsByClassName('app__controls-input'))[0]
 const btnEl = (document.getElementsByClassName('app__controls-button'))[0]
 const listEl = (document.getElementsByClassName('app__list'))[0]
 let counter = 1
 let data = []
 
-
-data.forEach((item) => {
-    if (item.id > counter) {
-        counter = item.id 
+//API
+async function getItemsApi(){
+    const res = await fetch( '${BASE_URL}/tasks', {
+        method: 'GET'
+    })
+    if (!res.ok){
+        console.log('mistake');
+        return 
     }
-})
-if (counter > 1){
-    counter++
+    data = await res.json()
 }
 
-//тоже сохранение данных
-function init() {
-    const tmp = localStorage.getItem('data')
-    if (tmp !== null) {
-        data = JSON.parse(tmp)
+async function createTaskApi(data){
+    const res = await fetch('${BASE_URL}/tasks', {
+        method: 'POST',
+        body: JSON.stringify({
+            text: data.text,
+            isDone: data.isDone
+        })
+    })
+    if (!res.ok){
+        console.log('mistake');
+        return 
     }
+    return await res.json()
+}
+
+async function changeStatusApi (id) {
+    const res = await fetch('${BASE_URL}/tasks/edit ', {
+        method: 'PATCH',
+        body: JSON.stringify({
+            id
+        })
+    })
+    if (!res.ok){
+        console.log('mistake');
+        return 
+    }
+    return await res.json()
+}
+
+
+
+//APP
+
+
+//тоже сохранение данных
+async function init() {
+    //const tmp = localStorage.getItem('data')
+    /*if (tmp !== null) {
+        data = JSON.parse(tmp)
+    }*/
+    data.forEach((item) => {
+        if (item.id > counter) {
+            counter = item.id 
+        }
+    })
+    if (counter > 1){
+        counter++
+    }
+    await getItemsApi()
     render()
 }
 
@@ -40,11 +87,12 @@ function syncData() {
 //превращаем значение data в тип string с помощью stringify
 
 //изменение цвета дел взависимости от их статуса
-function changeStatusById(id) {
-    const item = data.find((i) => {
+async function changeStatusById(id) {
+    const item = await changeStatusApi (id)
+    const idx = data.findIndex((i)=>{
         return i.id === id
     })
-    item.isDone = !item.isDone //заменяем объекты true на false и наоборот
+    data[idx] = item
     render()
 }
 
@@ -86,25 +134,30 @@ function createTask(objectData){
         deleteById(objectData.id)
     })
 
-    root.addEventListener('click', () => {
-        changeStatusById(objectData.id)
+    root.addEventListener('click', async () => {
+        await changeStatusById(objectData.id)
     })
     return root
 }
 
-btnEl.addEventListener('click', ()=>{
+btnEl.addEventListener('click', async ()=>{
     const textValue = inputEl.value
-    data.push({
+    const item = await createTaskApi({
+        text: textValue, 
+        isDone: false
+    })
+    data.push(item)
+    /*data.push({
         id: counter++,
         text: textValue,
         isDone: false,
-    })
-    syncData()
+    })*/
+    //syncData()
 
     inputEl.value = ''
+    render()
 })
 
-//функция render 
 function render(){
     listEl.innerHTML = ''
     for(let item of data){
@@ -112,4 +165,5 @@ function render(){
         listEl.appendChild(tmpElement)
     }
 }
+
 init()
