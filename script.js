@@ -8,7 +8,7 @@ let data = []
 
 //API
 async function getItemsApi(){
-    const res = await fetch( '${BASE_URL}/tasks', {
+    const res = await fetch( `${BASE_URL}/tasks`, {
         method: 'GET'
     })
     if (!res.ok){
@@ -19,7 +19,7 @@ async function getItemsApi(){
 }
 
 async function createTaskApi(data){
-    const res = await fetch('${BASE_URL}/tasks', {
+    const res = await fetch(`${BASE_URL}/tasks`, {
         method: 'POST',
         body: JSON.stringify({
             text: data.text,
@@ -34,7 +34,7 @@ async function createTaskApi(data){
 }
 
 async function changeStatusApi (id) {
-    const res = await fetch('${BASE_URL}/tasks/edit ', {
+    const res = await fetch(`${BASE_URL}/tasks/edit `, {
         method: 'PATCH',
         body: JSON.stringify({
             id
