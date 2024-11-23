@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../nOde"
+		},
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "ToDoList",
+		"liveServer.settings.port": 5501
+	}
+}
